@@ -28,12 +28,14 @@ public class TexSprite extends Sprite {
         texturePath = path;
     }
 
-    public void setCenter() {
+    public TexSprite setCenter() {
         super.setCenter(getWidth()/2, getHeight()/2);
+        return this;
     }
 
-    public void setPosition(Vector2 position) {
+    public TexSprite setPosition(Vector2 position) {
         super.setPosition(position.x, position.y);
+        return this;
     }
 
     public void dispose() {
