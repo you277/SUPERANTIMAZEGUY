@@ -114,7 +114,6 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 		float finalZ = z + zOff;
 
 		instance2.setPosition(finalX*3, finalY*3, finalZ*3);
-		grid.render(batch2);
 
 		cam2.position.set(finalX, finalY, finalZ);
 //		cam2.;
@@ -134,6 +133,7 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 		batch2.begin(cam2);
 		instance.render(batch2);
 		instance2.render(batch2);
+		grid.render(batch2);
 //		batch2.render(instance);
 		batch2.end();
 
