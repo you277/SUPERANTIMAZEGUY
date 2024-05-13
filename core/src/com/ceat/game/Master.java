@@ -17,11 +17,15 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 	ModelBatch batch2;
 	TexSprite sprite;
 	OrthographicCamera cam;
-	float elapsed;
-	float gameSpeed = 1;
+	private static float elapsed;
+	private static float gameSpeed = 1;
 	PerspectiveCamera cam2;
 	Model model;
 	SimpleModelInstance instance;
+	Model model2;
+	SimpleModelInstance instance2;
+
+	private Grid grid;
 	
 	@Override
 	public void create() {
@@ -31,28 +35,33 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 		sprite.setSize(100, 100);
 		cam = new OrthographicCamera(800, 600);
 		cam2 = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		model = new ModelBuilder().createBox(5, 5, 5,
-				new Material( ColorAttribute.createDiffuse(Color.WHITE) ), VertexAttributes.Usage.Position);
-		instance = new SimpleModelInstance(model);
+		model = SimpleModelInstance.planeModel;
+		instance = new SimpleModelInstance(model).setColor(1, 0, 0);
+		instance.setScale(5, 5, 5);
+//		instance.transform.scale(5, 5, 5);
+		model2 = SimpleModelInstance.planeModel;
+		instance2 = new SimpleModelInstance(model2).setColor(1, 1, 1);
+
+		grid = new Grid();
 	}
 
-	public float getDeltaTime() {
+	public static float getRawDeltaTime() {
 		return Gdx.graphics.getDeltaTime();
 	}
 
-	public float getScaledDeltaTime() {
-		return getDeltaTime()*gameSpeed;
+	public static float getDeltaTime() {
+		return getRawDeltaTime()*gameSpeed;
 	}
 	float horizontalRot;
 	float verticalRot;
 	float x;
 	float y;
-	float z = 10;
+	float z;
 	float camDist = 10;
 
 	@Override
 	public void render() {
-		float delta = getScaledDeltaTime();
+		float delta = getDeltaTime();
 		elapsed += delta;
 
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -90,23 +99,28 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 			verticalRot = Math.min(verticalRot + delta*180, 80);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-			verticalRot = Math.min(verticalRot - delta*180, 80);
+			verticalRot = Math.max(verticalRot - delta*180, -80);
 		}
 
-		double polar = Math.toRadians(horizontalRot);
-		double alpha = Math.toRadians(verticalRot);
+		double polar = Math.toRadians(verticalRot);
+		double alpha = Math.toRadians(horizontalRot);
 
-		float xOff = camDist * (float)(Math.cos(polar) * Math.cos(alpha));
-		float yOff = camDist * (float)(Math.cos(polar) * Math.sin(alpha));
-		float zOff = camDist * (float)Math.sin(polar);
+		float xOff = camDist * (float)(Math.sin(alpha) * Math.cos(polar));
+		float yOff = camDist * (float)Math.sin(polar);
+		float zOff = camDist * (float)(Math.cos(alpha) * Math.cos(polar));
 
 		float finalX = x + xOff;
 		float finalY = y + yOff;
-		float finalZ = y + zOff;
+		float finalZ = z + zOff;
 
-		cam2.position.set(x, y, z);
+		instance2.setPosition(finalX*3, finalY*3, finalZ*3);
+		grid.render(batch2);
+
+		cam2.position.set(finalX, finalY, finalZ);
 //		cam2.;
-		cam2.lookAt(finalX, finalY, finalZ);
+		cam2.lookAt(x, y, z);
+//		cam2.position.set(20, 20, 20);
+//		cam2.lookAt(0, 0, 0);
 		cam.near = 1;
 		cam.far = 300;
 		cam2.update();
@@ -116,8 +130,10 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 
 //instance.transform.set(new Vector3(0, (float)Math.sin(elapsed)*5, 0), new Quaternion());
 		instance.setPosition(0, (float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
+		instance2.setPosition(0, -(float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
 		batch2.begin(cam2);
 		instance.render(batch2);
+		instance2.render(batch2);
 //		batch2.render(instance);
 		batch2.end();
 
