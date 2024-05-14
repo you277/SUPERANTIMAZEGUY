@@ -26,9 +26,11 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 	SimpleModelInstance instance2;
 
 	private Grid grid;
+	CoolCamera camera;
 	
 	@Override
 	public void create() {
+		Gdx.input.setInputProcessor(this);
 		batch = new SpriteBatch();
 		batch2 = new ModelBatch();
 		sprite = new TexSprite("img/badlogic.jpg");
@@ -43,6 +45,7 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 		instance2 = new SimpleModelInstance(model2).setColor(1, 1, 1);
 
 		grid = new Grid();
+		camera = new CoolCamera();
 	}
 
 	public static float getRawDeltaTime() {
@@ -66,6 +69,7 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f);
 
 //		cam.position.set((float)Math.cos(elapsed)*50, (float)Math.sin(elapsed)*50, 0);
 //		cam.update();
@@ -90,17 +94,24 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 			y -= delta*30;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+			camera.rotateHorizontal(-delta*180);
 			horizontalRot = (horizontalRot - delta*180)%360;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			camera.rotateHorizontal(delta*180);
 			horizontalRot = (horizontalRot + delta*180)%360;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-			verticalRot = Math.min(verticalRot + delta*180, 80);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+			camera.rotateVertical(-delta*180);
 			verticalRot = Math.max(verticalRot - delta*180, -80);
 		}
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+			camera.rotateVertical(delta*180);
+			verticalRot = Math.min(verticalRot + delta*180, 80);
+		}
+
+		Schedule.runTasks(delta);
+		Loop.runLoops(delta);
 
 		double polar = Math.toRadians(verticalRot);
 		double alpha = Math.toRadians(horizontalRot);
@@ -129,7 +140,10 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 
 //instance.transform.set(new Vector3(0, (float)Math.sin(elapsed)*5, 0), new Quaternion());
 		instance.setPosition(0, (float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
-		instance2.setPosition(0, -(float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
+//		instance2.setPosition(0, -(float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
+		instance2.setPosition(camera.getRenderPosition());
+		camera.render(delta);
+//		batch2.begin(camera.getCamera());
 		batch2.begin(cam2);
 		instance.render(batch2);
 		instance2.render(batch2);
@@ -142,8 +156,22 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 //		batch.end();
 	}
 
+	int x2 = 0;
+	int y2 = 0;
+
 	@Override
 	public boolean keyDown(int keycode) {
+		if (keycode == Input.Keys.NUMPAD_4) {
+			x2--;
+		} else if (keycode == Input.Keys.NUMPAD_6) {
+			x2++;
+		} else if (keycode == Input.Keys.NUMPAD_8) {
+			y2--;
+		} else if (keycode == Input.Keys.NUMPAD_2) {
+			y2++;
+		}
+		grid.setTargetPosition(x2, y2);
+		camera.setFocusPosition(x2, y2);
 		return false;
 	}
 	@Override

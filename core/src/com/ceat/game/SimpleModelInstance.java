@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
@@ -50,12 +51,12 @@ public class SimpleModelInstance extends ModelInstance {
         materials.get(0).set(ColorAttribute.createDiffuse(color));
         return this;
     }
-    public SimpleModelInstance setColor(float r, float g, float b, float a) {
-        materials.get(0).set(ColorAttribute.createDiffuse(new Color(r, g, b, a)));
+    public SimpleModelInstance setOpacity(float opacity) {
+        materials.get(0).set(new BlendingAttribute(opacity));
         return this;
     }
     public SimpleModelInstance setColor(float r, float g, float b) {
-        setColor(r, g, b, 1);
+        materials.get(0).set(ColorAttribute.createDiffuse(new Color(r, g, b, 1)));
         return this;
     }
 
