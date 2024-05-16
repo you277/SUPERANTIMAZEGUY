@@ -1,6 +1,10 @@
-package com.ceat.game;
+package com.ceat.game.entity;
 
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.math.Vector3;
+import com.ceat.game.Lerp;
+import com.ceat.game.Loop;
+import com.ceat.game.SimpleModelInstance;
 
 public class GridTile {
     private SimpleModelInstance model;
@@ -8,6 +12,7 @@ public class GridTile {
     private int y;
     private float yOffset;
     private boolean active;
+    private float lifetime;
     public GridTile(int x, int y) {
         model = new SimpleModelInstance(SimpleModelInstance.planeModel)
                 .setScale(5, 5, 5)
@@ -36,9 +41,17 @@ public class GridTile {
     public boolean getActive() {
         return active;
     }
+    public Vector3 getAbsolutePosition() {
+        return new Vector3(x*6, (float)Math.sin(lifetime*2 + x + y)*0.7f + yOffset, y*6);
+    }
+    public void render(ModelBatch batch) {
+        model.setPosition(getAbsolutePosition());
+        model.render(batch);
+    }
 
     public void render(float lifetime, ModelBatch batch) {
-        model.setPosition(x*6, (float)Math.sin(lifetime*2 + x + y)*0.7f + yOffset, y*6);
+        this.lifetime = lifetime;
+        model.setPosition(getAbsolutePosition());
         model.render(batch);
     }
 

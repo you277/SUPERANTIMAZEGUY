@@ -24,6 +24,7 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 	SimpleModelInstance instance;
 	Model model2;
 	SimpleModelInstance instance2;
+	SimpleModelInstance instance3;
 
 	private Grid grid;
 	CoolCamera camera;
@@ -43,6 +44,7 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 //		instance.transform.scale(5, 5, 5);
 		model2 = SimpleModelInstance.planeModel;
 		instance2 = new SimpleModelInstance(model2).setColor(1, 1, 1);
+		instance3 = new SimpleModelInstance(model2).setColor(1, 1, 1);
 
 		grid = new Grid();
 		camera = new CoolCamera();
@@ -126,11 +128,11 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 
 		instance2.setPosition(finalX*3, finalY*3, finalZ*3);
 
-		cam2.position.set(finalX, finalY, finalZ);
+//		cam2.position.set(finalX, finalY, finalZ);
 //		cam2.;
-		cam2.lookAt(x, y, z);
-//		cam2.position.set(20, 20, 20);
-//		cam2.lookAt(0, 0, 0);
+//		cam2.lookAt(x, y, z);
+		cam2.position.set(20, 20, 20);
+		cam2.lookAt(0, 0, 0);
 		cam.near = 1;
 		cam.far = 300;
 		cam2.update();
@@ -142,11 +144,13 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 		instance.setPosition(0, (float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
 //		instance2.setPosition(0, -(float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
 		instance2.setPosition(camera.getRenderPosition());
+		instance3.setPosition(camera.getFocusPosition());
 		camera.render(delta);
-//		batch2.begin(camera.getCamera());
-		batch2.begin(cam2);
+		batch2.begin(camera.getCamera());
+//		batch2.begin(cam2);
 		instance.render(batch2);
 		instance2.render(batch2);
+		instance3.render(batch2);
 		grid.render(batch2);
 //		batch2.render(instance);
 		batch2.end();

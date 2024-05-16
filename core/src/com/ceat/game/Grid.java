@@ -1,6 +1,7 @@
 package com.ceat.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.ceat.game.entity.GridTile;
 
 import java.util.HashMap;
 
