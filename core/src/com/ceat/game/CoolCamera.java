@@ -70,10 +70,6 @@ public class CoolCamera {
         float finalY = renderY + yOff;
         float finalZ = renderZ + zOff;
 
-        System.out.println(renderX + ", " + renderY + ", " + renderZ);
-
-        System.out.println(xOff + ", " + zOff);
-
 //        System.out.println("" + finalX + ", " + finalY + ", " + finalZ);
 
         cam.position.set(finalX, finalY, finalZ);

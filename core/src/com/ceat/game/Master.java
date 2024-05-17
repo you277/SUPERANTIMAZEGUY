@@ -14,40 +14,17 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
 public class Master extends ApplicationAdapter implements InputProcessor {
 	SpriteBatch batch;
-	ModelBatch batch2;
-	TexSprite sprite;
-	OrthographicCamera cam;
+	ModelBatch modelBatch;
 	private static float elapsed;
 	private static float gameSpeed = 1;
-	PerspectiveCamera cam2;
-	Model model;
-	SimpleModelInstance instance;
-	Model model2;
-	SimpleModelInstance instance2;
-	SimpleModelInstance instance3;
-
-	private Grid grid;
-	CoolCamera camera;
+	private Game game;
 	
 	@Override
 	public void create() {
 		Gdx.input.setInputProcessor(this);
 		batch = new SpriteBatch();
-		batch2 = new ModelBatch();
-		sprite = new TexSprite("img/badlogic.jpg");
-		sprite.setSize(100, 100);
-		cam = new OrthographicCamera(800, 600);
-		cam2 = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		model = SimpleModelInstance.planeModel;
-		instance = new SimpleModelInstance(model).setColor(1, 0, 0);
-		instance.setScale(5, 5, 5);
-//		instance.transform.scale(5, 5, 5);
-		model2 = SimpleModelInstance.planeModel;
-		instance2 = new SimpleModelInstance(model2).setColor(1, 1, 1);
-		instance3 = new SimpleModelInstance(model2).setColor(1, 1, 1);
-
-		grid = new Grid();
-		camera = new CoolCamera();
+		modelBatch = new ModelBatch();
+		game = new Game();
 	}
 
 	public static float getRawDeltaTime() {
@@ -64,6 +41,13 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 	float z;
 	float camDist = 10;
 
+	private void rotateCameraHorizontal(float rot) {
+		game.getCamera().rotateHorizontal(rot);
+	}
+	private void rotateCameraVertical(float rot) {
+		game.getCamera().rotateVertical(rot);
+	}
+
 	@Override
 	public void render() {
 		float delta = getDeltaTime();
@@ -73,109 +57,34 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f);
 
-//		cam.position.set((float)Math.cos(elapsed)*50, (float)Math.sin(elapsed)*50, 0);
-//		cam.update();
-//		batch.setProjectionMatrix(cam.combined);
-
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			z -= delta*30;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			z += delta*30;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			x -= delta*30;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			x += delta*30;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
-			y += delta*30;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-			y -= delta*30;
-		}
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			camera.rotateHorizontal(-delta*180);
+			rotateCameraHorizontal(-delta*180);
 			horizontalRot = (horizontalRot - delta*180)%360;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			camera.rotateHorizontal(delta*180);
+			rotateCameraHorizontal(delta*180);
 			horizontalRot = (horizontalRot + delta*180)%360;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-			camera.rotateVertical(-delta*180);
+			rotateCameraVertical(-delta*180);
 			verticalRot = Math.max(verticalRot - delta*180, -80);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-			camera.rotateVertical(delta*180);
+			rotateCameraVertical(delta*180);
 			verticalRot = Math.min(verticalRot + delta*180, 80);
 		}
 
 		Schedule.runTasks(delta);
 		Loop.runLoops(delta);
 
-		double polar = Math.toRadians(verticalRot);
-		double alpha = Math.toRadians(horizontalRot);
-
-		float xOff = camDist * (float)(Math.sin(alpha) * Math.cos(polar));
-		float yOff = camDist * (float)Math.sin(polar);
-		float zOff = camDist * (float)(Math.cos(alpha) * Math.cos(polar));
-
-		float finalX = x + xOff;
-		float finalY = y + yOff;
-		float finalZ = z + zOff;
-
-		instance2.setPosition(finalX*3, finalY*3, finalZ*3);
-
-//		cam2.position.set(finalX, finalY, finalZ);
-//		cam2.;
-//		cam2.lookAt(x, y, z);
-		cam2.position.set(20, 20, 20);
-		cam2.lookAt(0, 0, 0);
-		cam.near = 1;
-		cam.far = 300;
-		cam2.update();
-
-//		ScreenUtils.clear(0, 0, 0, 1);
-
-
-//instance.transform.set(new Vector3(0, (float)Math.sin(elapsed)*5, 0), new Quaternion());
-		instance.setPosition(0, (float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
-//		instance2.setPosition(0, -(float)Math.sin(elapsed)*5, 0).setRotation(elapsed*90, elapsed*90, elapsed*90);
-		instance2.setPosition(camera.getRenderPosition());
-		instance3.setPosition(camera.getFocusPosition());
-		camera.render(delta);
-		batch2.begin(camera.getCamera());
-//		batch2.begin(cam2);
-		instance.render(batch2);
-		instance2.render(batch2);
-		instance3.render(batch2);
-		grid.render(batch2);
-//		batch2.render(instance);
-		batch2.end();
-
-//		batch.begin();
-//		sprite.draw(batch);
-//		batch.end();
+		modelBatch.begin(game.getCamera().getCamera());
+		game.render(batch, modelBatch);
+		modelBatch.end();
 	}
-
-	int x2 = 0;
-	int y2 = 0;
 
 	@Override
 	public boolean keyDown(int keycode) {
-		if (keycode == Input.Keys.NUMPAD_4) {
-			x2--;
-		} else if (keycode == Input.Keys.NUMPAD_6) {
-			x2++;
-		} else if (keycode == Input.Keys.NUMPAD_8) {
-			y2--;
-		} else if (keycode == Input.Keys.NUMPAD_2) {
-			y2++;
-		}
-		grid.setTargetPosition(x2, y2);
-		camera.setFocusPosition(x2, y2);
+		game.keydown(keycode);
 		return false;
 	}
 	@Override

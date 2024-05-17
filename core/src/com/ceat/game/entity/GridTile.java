@@ -2,18 +2,21 @@ package com.ceat.game.entity;
 
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.ceat.game.Grid;
 import com.ceat.game.Lerp;
 import com.ceat.game.Loop;
 import com.ceat.game.SimpleModelInstance;
 
 public class GridTile {
+    private Grid grid;
     private SimpleModelInstance model;
     private int x;
     private int y;
     private float yOffset;
     private boolean active;
     private float lifetime;
-    public GridTile(int x, int y) {
+    public GridTile(int x, int y, Grid grid) {
+        this.grid = grid;
         model = new SimpleModelInstance(SimpleModelInstance.planeModel)
                 .setScale(5, 5, 5)
                 .setColor(0, 0, 0)
@@ -42,7 +45,8 @@ public class GridTile {
         return active;
     }
     public Vector3 getAbsolutePosition() {
-        return new Vector3(x*6, (float)Math.sin(lifetime*2 + x + y)*0.7f + yOffset, y*6);
+        Vector3 pos = grid.imagineTilePosition(x, y);
+        return new Vector3(pos.x, pos.y + yOffset, pos.z);
     }
     public void render(ModelBatch batch) {
         model.setPosition(getAbsolutePosition());
