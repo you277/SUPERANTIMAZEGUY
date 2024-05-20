@@ -11,15 +11,15 @@ import java.util.HashMap;
 public class Grid {
     private static int gridDistance = 5;
     private float lifetime;
-    private HashMap<String, GridTile> gridModels;
-    private HashMap<String, GridTile> removingModels;
+    private ArrayList<GridTile> gridTiles;
+    private ArrayList<GridTile> removingTiles;
     private Player player;
     private int targetX;
     private int targetY;
 
     public Grid() {
-        gridModels = new HashMap<>();
-        removingModels = new HashMap<>();
+        gridTiles = new ArrayList<>();
+        removingTiles = new ArrayList<>();
         checkTiles();
     }
 
@@ -37,57 +37,57 @@ public class Grid {
     }
 
     public Grid checkTiles() {
+        HashMap<String, Integer> wow = new HashMap<>();
+        for (int i = 0; i < gridTiles.size(); i++) {
+            GridTile tile = gridTiles.get(i);
+            wow.put(tile.getX() + "~" + tile.getY(), i);
+        }
         for (int xOffset = -gridDistance; xOffset <= gridDistance; xOffset++) {
             for (int yOffset = -gridDistance; yOffset <= gridDistance; yOffset++) {
                 int x = targetX + xOffset;
                 int y = targetY + yOffset;
                 String index = x + "~" + y;
-                if (!gridModels.containsKey(index)) {
-                    gridModels.put(index, new GridTile(x, y, this) {
+                if (!wow.containsKey(index)) {
+                    gridTiles.add(new GridTile(x, y, this) {
                         public void onDispose() {
-                            removingModels.remove(index);
+                            removingTiles.remove(this);
                         }
                     });
                 }
             }
         }
-        ArrayList<String> tilesToRemove = new ArrayList<>();
-        for (String i: gridModels.keySet()) {
-            GridTile tile = gridModels.get(i);
+        ArrayList<GridTile> tilesToRemove = new ArrayList<>();
+        for (GridTile tile: gridTiles) {
             int xDist = Math.abs(tile.getX() - targetX);
             int yDist = Math.abs(tile.getY() - targetY);
             if ((xDist > gridDistance || yDist > gridDistance) && tile.getActive()) {
-                tilesToRemove.add(i);
+                tilesToRemove.add(tile);
                 tile.exit();
             }
         }
-        for (String name: tilesToRemove) {
-            GridTile tile = gridModels.get(name);
-            gridModels.remove(name);
-            removingModels.put(name, tile);
+        for (GridTile tile: tilesToRemove) {
+            gridTiles.remove(tile);
+            removingTiles.add(tile);
         }
         return this;
     }
 
     public GridTile getTile(int x, int y) {
-        String index = x + "~" + y;
-        System.out.print(index);System.out.print(gridModels.containsKey(index));System.out.println(gridModels.get(index));
-        if (gridModels.containsKey(index)) {
-            System.out.println(gridModels.get(index).getClass());
+        for (GridTile tile: gridTiles) {
+            if (x == tile.getX() && y == tile.getY()) {
+                return tile;
+            }
         }
-        if (gridModels.containsKey(index)) gridModels.get(index);
         return null;
     }
 
     public void render(ModelBatch batch) {
         lifetime += Master.getDeltaTime();
         checkTiles();
-        for (String i: removingModels.keySet()) {
-            GridTile tile = removingModels.get(i);
+        for (GridTile tile: removingTiles) {
             tile.render(lifetime, batch);
         }
-        for (String i: gridModels.keySet()) {
-            GridTile tile = gridModels.get(i);
+        for (GridTile tile: gridTiles) {
             tile.render(lifetime, batch);
         }
 //        player.render();

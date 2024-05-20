@@ -34,6 +34,9 @@ public class SimpleModelInstance extends ModelInstance {
         position = newPosition;
         return this;
     }
+    public Vector3 getPosition() {
+        return position;
+    }
     public SimpleModelInstance setRotation(float x, float y, float z) {
         rotation = new Vector3(x, y, z);
         return this;

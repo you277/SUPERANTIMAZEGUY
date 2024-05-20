@@ -76,4 +76,8 @@ public class GridTile {
     public void dispose() {
         model.dispose();
     }
+
+    public String toString() {
+        return x + " ~ " + y;
+    }
 }

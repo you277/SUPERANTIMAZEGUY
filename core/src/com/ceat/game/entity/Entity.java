@@ -22,11 +22,10 @@ public class Entity {
         this.x = x;
         this.y = y;
         this.z = y;
+        model.setPosition(x, y + (float)Math.random()*20 - 10, z);
     }
     public void setAbsolutePosition(Vector3 position) {
-        x = position.x;
-        y = position.y;
-        z = position.z;
+        setAbsolutePosition(position.x, position.y, position.z);
     }
 
     public Vector3 getAbsolutePosition() {

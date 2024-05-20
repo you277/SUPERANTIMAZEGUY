@@ -25,6 +25,7 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 		batch = new SpriteBatch();
 		modelBatch = new ModelBatch();
 		game = new Game();
+		Font.createGenerator();
 	}
 
 	public static float getRawDeltaTime() {
@@ -78,8 +79,11 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 		Loop.runLoops(delta);
 
 		modelBatch.begin(game.getCamera().getCamera());
-		game.render(batch, modelBatch);
+		game.renderModels(modelBatch);
 		modelBatch.end();
+		batch.begin();
+		game.renderGui(batch);
+		batch.end();
 	}
 
 	@Override

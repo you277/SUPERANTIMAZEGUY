@@ -5,11 +5,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.ceat.game.entity.Player;
+import com.ceat.game.gui.GameGui;
 
 public class Game {
     private Grid grid;
     private Player player;
     private CoolCamera camera;
+    private GameGui gameGui;
     private int playerX;
     private int playerY;
 
@@ -17,9 +19,9 @@ public class Game {
         grid = new Grid().checkTiles();
         player = new Player(grid);
         camera = new CoolCamera();
+        gameGui = new GameGui();
         grid.setPlayer(player);
         player.setParentTile(grid.getTile(0, 0));
-        System.out.println(grid.getTile(0, 0) == null);
     }
 
     public void keydown(int keycode) {
@@ -52,11 +54,15 @@ public class Game {
         return camera;
     }
 
-    public void render(SpriteBatch batch, ModelBatch modelBatch) {
+    public void renderModels(ModelBatch batch) {
         camera.render(Master.getDeltaTime());
-        grid.render(modelBatch);
+        grid.render(batch);
         player.render();
-        player.draw(modelBatch);
+        player.draw(batch);
+    }
+    public void renderGui(SpriteBatch batch) {
+        gameGui.render();
+        gameGui.draw(batch);
     }
 
     public void rotateCamera(float xRot, float yRot) {

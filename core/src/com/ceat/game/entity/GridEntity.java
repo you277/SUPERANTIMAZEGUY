@@ -25,10 +25,12 @@ public class GridEntity extends Entity {
         parentTile = tile;
         return this;
     }
+    public GridTile getParentTile() {
+        return  parentTile;
+    }
     public void setGridPosition(int x, int y) {
         gridX = x;
         gridY = y;
-        System.out.println(grid.getTile(x, y));
         setParentTile(grid.getTile(x, y));
     }
     public void animateJump(GridTile newParent) {
@@ -51,6 +53,7 @@ public class GridEntity extends Entity {
     public void render() {
         if (!isAnimating && parentTile != null) {
             setAbsolutePosition(parentTile.getAbsolutePosition());
+            System.out.println(getModel().getPosition());
         }
     }
     public void draw(ModelBatch batch) {
