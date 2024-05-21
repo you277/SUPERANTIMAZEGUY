@@ -22,7 +22,7 @@ public class Entity {
         this.x = x;
         this.y = y;
         this.z = y;
-        model.setPosition(x, y + (float)Math.random()*20 - 10, z);
+        model.setPosition(x, y, z);
     }
     public void setAbsolutePosition(Vector3 position) {
         setAbsolutePosition(position.x, position.y, position.z);

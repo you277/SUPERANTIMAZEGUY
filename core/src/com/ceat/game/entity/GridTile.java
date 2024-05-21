@@ -15,14 +15,18 @@ public class GridTile {
     private float yOffset;
     private boolean active;
     private float lifetime;
-    public GridTile(int x, int y, Grid grid) {
+    private boolean isExisting;
+    public GridTile(int x, int y, Grid grid, boolean tileExists) {
         this.grid = grid;
-        model = new SimpleModelInstance(SimpleModelInstance.planeModel)
-                .setScale(5, 5, 5)
-                .setColor(0, 0, 0)
-                .setOpacity(0.2f);
         this.x = x;
         this.y = y;
+        isExisting = tileExists;
+        if (isExisting) {
+            model = new SimpleModelInstance(SimpleModelInstance.planeModel)
+                    .setScale(5, 5, 5)
+                    .setColor(0, 0, 0)
+                    .setOpacity(0.2f);
+        }
         active = true;
         yOffset = 20;
         new Loop(0.3f) {
@@ -33,6 +37,10 @@ public class GridTile {
                 yOffset = 0;
             }
         };
+    }
+
+    public boolean getIsExistent() {
+        return isExisting;
     }
 
     public int getX() {
@@ -49,14 +57,18 @@ public class GridTile {
         return new Vector3(pos.x, pos.y + yOffset, pos.z);
     }
     public void render(ModelBatch batch) {
-        model.setPosition(getAbsolutePosition());
-        model.render(batch);
+        if (model != null) {
+            model.setPosition(getAbsolutePosition());
+            model.render(batch);
+        }
     }
 
     public void render(float lifetime, ModelBatch batch) {
         this.lifetime = lifetime;
-        model.setPosition(getAbsolutePosition());
-        model.render(batch);
+       if (model != null) {
+           model.setPosition(getAbsolutePosition());
+           model.render(batch);
+       }
     }
 
     public void exit() {
@@ -74,10 +86,8 @@ public class GridTile {
 
     public void onDispose() {}
     public void dispose() {
-        model.dispose();
-    }
-
-    public String toString() {
-        return x + " ~ " + y;
+       if (model != null) {
+           model.dispose();
+       }
     }
 }

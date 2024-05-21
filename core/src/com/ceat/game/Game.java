@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.ceat.game.entity.GridTile;
 import com.ceat.game.entity.Player;
 import com.ceat.game.gui.GameGui;
 
@@ -16,7 +17,7 @@ public class Game {
     private int playerY;
 
     public Game() {
-        grid = new Grid().checkTiles();
+        grid = new Grid().checkTiles(0, 0);
         player = new Player(grid);
         camera = new CoolCamera();
         gameGui = new GameGui();
@@ -43,10 +44,18 @@ public class Game {
         }
         if (oldX != playerX || oldY != playerY) {
             grid.setTargetPosition(playerX, playerY);
-            grid.checkTiles();
-//            player.animateJump(grid.getTile(playerX, playerY));
-            player.setGridPosition(playerX, playerY);
-            camera.setFocusPosition(playerX, playerY);
+            grid.checkTiles(playerX, playerY);
+            GridTile tile = grid.getTile(playerX, playerY);
+            if (tile.getIsExistent()) {
+                grid.setTargetPosition(oldX, oldY);
+                player.animateJump(grid.getTile(playerX, playerY));
+                player.setGridPosition(playerX, playerY);
+                camera.setFocusPosition(playerX, playerY);
+            } else {
+                playerX = oldX;
+                playerY = oldY;
+                player.animateJump(grid.getTile(oldX, oldY));
+            }
         }
     }
 

@@ -66,9 +66,12 @@ public class CoolCamera {
         renderY = Lerp.lerp(renderY, targetY, Lerp.alpha(delta, 5));
         renderZ = Lerp.lerp(renderZ, targetZ, Lerp.alpha(delta, 5));
 
-        float finalX = renderX + xOff;
-        float finalY = renderY + yOff;
-        float finalZ = renderZ + zOff;
+//        float finalX = renderX + xOff;
+//        float finalY = renderY + yOff;
+//        float finalZ = renderZ + zOff;
+        float finalX = renderX + 35;
+        float finalY = renderY + 25;
+        float finalZ = renderZ + 35;
 
 //        System.out.println("" + finalX + ", " + finalY + ", " + finalZ);
 

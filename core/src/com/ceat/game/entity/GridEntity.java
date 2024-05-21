@@ -18,7 +18,7 @@ public class GridEntity extends Entity {
         super();
         this.grid = grid;
         setGridPosition(gridX, gridY);
-        getModel().setScale(200, 200, 200);
+        getModel().setScale(3, 3, 3);
     }
 
     public GridEntity setParentTile(GridTile tile) {
@@ -38,10 +38,11 @@ public class GridEntity extends Entity {
         Vector3 currentNewPos = newParent.getAbsolutePosition();
         Vector3 midPos = new Vector3((oldPos.x + currentNewPos.x)/2, (oldPos.y + currentNewPos.y)/2 + 10, (oldPos.z + currentNewPos.z)/2);
         isAnimating = true;
-        new Loop(0.4f) {
+        new Loop(0.2f) {
             public void run(float dt, float elapsed) {
-                float progress = elapsed/0.4f;
-                setAbsolutePosition(Lerp.threePointBezier(oldPos, midPos, newParent.getAbsolutePosition(), progress));
+                float progress = elapsed/0.2f;
+                Vector3 p = Lerp.threePointBezier(oldPos, midPos, newParent.getAbsolutePosition(), progress);
+                setAbsolutePosition(p.x, p.y + 0.1f, p.z);
             }
             public void onEnd() {
                 isAnimating = false;
@@ -52,12 +53,12 @@ public class GridEntity extends Entity {
 
     public void render() {
         if (!isAnimating && parentTile != null) {
-            setAbsolutePosition(parentTile.getAbsolutePosition());
-            System.out.println(getModel().getPosition());
+            Vector3 p = parentTile.getAbsolutePosition();
+            setAbsolutePosition(p.x, p.y + 0.1f, p.z);
         }
     }
     public void draw(ModelBatch batch) {
-        batch.render(getModel());
+        getModel().render(batch);
     }
 
     public IntVector2 getGridPosition() {

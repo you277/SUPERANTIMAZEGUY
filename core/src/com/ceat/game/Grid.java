@@ -20,7 +20,7 @@ public class Grid {
     public Grid() {
         gridTiles = new ArrayList<>();
         removingTiles = new ArrayList<>();
-        checkTiles();
+        checkTiles(targetX, targetY);
     }
 
     public void setPlayer(Player player) {
@@ -36,7 +36,7 @@ public class Grid {
         return new Vector3(x*6, (float)Math.sin(lifetime*2 + x + y)*0.7f, y*6);
     }
 
-    public Grid checkTiles() {
+    public Grid checkTiles(int playerX, int playerY) {
         HashMap<String, Integer> wow = new HashMap<>();
         for (int i = 0; i < gridTiles.size(); i++) {
             GridTile tile = gridTiles.get(i);
@@ -48,7 +48,7 @@ public class Grid {
                 int y = targetY + yOffset;
                 String index = x + "~" + y;
                 if (!wow.containsKey(index)) {
-                    gridTiles.add(new GridTile(x, y, this) {
+                    gridTiles.add(new GridTile(x, y, this, (playerX == x && playerY == y) || Math.random() < 0.8) {
                         public void onDispose() {
                             removingTiles.remove(this);
                         }
@@ -81,9 +81,13 @@ public class Grid {
         return null;
     }
 
+    public void checkTiles(IntVector2 pos) {
+        checkTiles(pos.getX(), pos.getY());
+    }
+
     public void render(ModelBatch batch) {
         lifetime += Master.getDeltaTime();
-        checkTiles();
+        checkTiles(targetX, targetY);
         for (GridTile tile: removingTiles) {
             tile.render(lifetime, batch);
         }
