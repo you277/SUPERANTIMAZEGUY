@@ -3,7 +3,7 @@ package com.ceat.game;
 import java.util.ArrayList;
 
 public class Loop {
-    private static ArrayList<Loop> loops = new ArrayList<>();
+    private static final ArrayList<Loop> loops = new ArrayList<>();
     public static void runLoops(float deltaTime) {
         for (int i = 0; i < loops.size(); i++) {
             Loop loop = loops.get(i);
@@ -16,7 +16,7 @@ public class Loop {
             }
         }
     }
-    private float duration;
+    private final float duration;
     private float lifetime;
     public Loop(float duration) {
         this.duration = duration;

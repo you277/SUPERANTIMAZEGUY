@@ -11,8 +11,8 @@ import java.util.HashMap;
 public class Grid {
     private static int gridDistance = 5;
     private float lifetime;
-    private ArrayList<GridTile> gridTiles;
-    private ArrayList<GridTile> removingTiles;
+    private final ArrayList<GridTile> gridTiles;
+    private final ArrayList<GridTile> removingTiles;
     private Player player;
     private int targetX;
     private int targetY;
@@ -94,7 +94,5 @@ public class Grid {
         for (GridTile tile: gridTiles) {
             tile.render(lifetime, batch);
         }
-//        player.render();
-//        player.draw(batch);
     }
 }

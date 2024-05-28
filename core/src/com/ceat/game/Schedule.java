@@ -3,7 +3,7 @@ package com.ceat.game;
 import java.util.ArrayList;
 
 public class Schedule {
-    public class Task {
+    public static class Task {
         private float lifetime;
         private float timeAlive;
         public void run() {}
@@ -17,7 +17,7 @@ public class Schedule {
         }
     }
 
-    private static ArrayList<Task> tasks = new ArrayList<>();
+    private static final ArrayList<Task> tasks = new ArrayList<>();
     public static void runTasks(float delta) {
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
@@ -37,7 +37,7 @@ public class Schedule {
     }
 
     public Schedule run(Task task) {
-        tasks.add(new Task().setLifetime(currentTime));
+        tasks.add(task.setLifetime(currentTime));
         return this;
     }
 }

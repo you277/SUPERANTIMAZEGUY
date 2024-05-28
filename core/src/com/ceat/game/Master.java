@@ -6,11 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
 public class Master extends ApplicationAdapter implements InputProcessor {
 	SpriteBatch batch;
@@ -37,10 +33,6 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 	}
 	float horizontalRot;
 	float verticalRot;
-	float x;
-	float y;
-	float z;
-	float camDist = 10;
 
 	private void rotateCameraHorizontal(float rot) {
 		game.getCamera().rotateHorizontal(rot);

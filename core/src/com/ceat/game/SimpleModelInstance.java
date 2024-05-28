@@ -16,6 +16,8 @@ public class SimpleModelInstance extends ModelInstance {
             new Material( ColorAttribute.createDiffuse(Color.WHITE) ), VertexAttributes.Usage.Position);
     public static Model cubeModel = new ModelBuilder().createBox(1, 1, 1,
             new Material( ColorAttribute.createDiffuse(Color.WHITE) ), VertexAttributes.Usage.Position);
+    public static Model sphereModel = new ModelBuilder().createSphere(1, 1, 1, 10, 10,
+            new Material( ColorAttribute.createDiffuse(Color.WHITE) ), VertexAttributes.Usage.Position);
     private Vector3 position;
     private Vector3 rotation; // euler x y z
     private Vector3 scale;
@@ -45,8 +47,15 @@ public class SimpleModelInstance extends ModelInstance {
         rotation = newRotation;
         return this;
     }
+    public Vector3 getRotation() {
+        return rotation;
+    }
     public SimpleModelInstance setScale(float x, float y, float z) {
         scale = new Vector3(x, y, z);
+        return this;
+    }
+    public SimpleModelInstance setScale(float scale) {
+        setScale(scale, scale, scale);
         return this;
     }
 
