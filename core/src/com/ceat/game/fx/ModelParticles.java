@@ -70,6 +70,7 @@ public class ModelParticles {
             model.dispose();
         }
     }
+    private boolean enabled = true;
     private float spreadX;
     private float spreadY;
     private float minSpeed;
@@ -80,7 +81,7 @@ public class ModelParticles {
     private float maxRotSpeed;
     private float startScale;
     private float endScale;
-    private float rate;
+    private float rate = 20;
     private Color color;
     private Vector3 origin = new Vector3();
     private Vector3 direction = new Vector3(0, 1, 0);
@@ -89,6 +90,10 @@ public class ModelParticles {
 
     public ModelParticles(Model model) {
         baseModel = model;
+    }
+    public ModelParticles setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        return this;
     }
     public ModelParticles setOrigin(Vector3 origin) {
         this.origin = origin;
@@ -156,16 +161,18 @@ public class ModelParticles {
         return this;
     }
 
-    public void emit(int amt) {
+    public ModelParticles emit(int amt) {
         for (int i = 0; i < amt; i++) {
             float speed = minSpeed + (float)Math.random()*(maxSpeed - minSpeed);
             float rotSpeed = minRotSpeed + (float)Math.random()*(maxRotSpeed - minRotSpeed);
             float lifetime = minLife + (float)Math.random()*(maxLife - minLife);
             particles.add(new Particle(baseModel, origin, speed, rotSpeed, lifetime, direction, new Vector3(spreadX, spreadY, 0), startScale, endScale, color));
         }
+        return this;
     }
-    public void emit() {
+    public ModelParticles emit() {
         emit(1);
+        return this;
     }
 
     private float lastEmitTime;
@@ -176,7 +183,9 @@ public class ModelParticles {
         int emitAmt = (int)((now - lastEmitTime)/rate);
         if (emitAmt > 0) {
             lastEmitTime = now;
-            emit(emitAmt);
+            if (enabled) {
+                emit(emitAmt);
+            }
         }
         ArrayList<Particle> toRemove = new ArrayList<>();
         for (Particle particle: particles) {
@@ -185,6 +194,7 @@ public class ModelParticles {
             }
         }
         for (Particle particle: toRemove) {
+            particle.dispose();
             particles.remove(particle);
         }
         return particles.size() > 0;

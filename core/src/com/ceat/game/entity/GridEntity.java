@@ -33,6 +33,9 @@ public class GridEntity extends Entity {
         gridY = y;
         setParentTile(grid.getTile(x, y));
     }
+    public Grid getGrid() {
+        return grid;
+    }
     public void animateJump(GridTile newParent) {
         Vector3 oldPos = parentTile.getAbsolutePosition();
         Vector3 currentNewPos = newParent.getAbsolutePosition();

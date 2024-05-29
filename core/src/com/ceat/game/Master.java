@@ -7,6 +7,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.ceat.game.fx.Effect;
 
 public class Master extends ApplicationAdapter implements InputProcessor {
 	SpriteBatch batch;
@@ -72,8 +73,10 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 
 		modelBatch.begin(game.getCamera().getCamera());
 		game.renderModels(modelBatch);
+		Effect.drawEffects(modelBatch);
 		modelBatch.end();
 		batch.begin();
+		Effect.drawEffects(batch);
 		game.renderGui(batch);
 		batch.end();
 	}

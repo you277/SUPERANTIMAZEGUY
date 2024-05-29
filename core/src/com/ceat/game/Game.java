@@ -27,7 +27,8 @@ public class Game {
     private ArrayList<ModelParticles> modelParticles = new ArrayList<>();
 
     public Game() {
-        grid = new Grid().checkTiles(0, 0);
+        grid = new Grid();
+        grid.checkTiles(0, 0);
         player = new Player(grid);
         camera = new CoolCamera();
         gameGui = new GameGui();
@@ -38,6 +39,13 @@ public class Game {
 
     public void addParticles(ModelParticles modelParticle) {
         modelParticles.add(modelParticle);
+    }
+
+    private void rollEnemySpawn(GridTile tile) {
+        if (!tile.getIsExistent()) return;
+        if (Math.random() < 0.3) {
+            enemies.add(new Enemy(grid, tile.getX(), tile.getY()));
+        }
     }
 
     public void keydown(int keycode) {
@@ -63,12 +71,14 @@ public class Game {
                 playerY = oldY;
                 return;
             }
-            enemies.add(new Enemy(grid, oldX, oldY));
-            grid.setTargetPosition(playerX, playerY);
-            grid.checkTiles(playerX, playerY);
             GridTile tile = grid.getTile(playerX, playerY);
             if (tile.getIsExistent()) {
+                grid.setTargetPosition(playerX, playerY);
+                ArrayList<GridTile> newTiles = grid.checkTiles(playerX, playerY, enemies);
                 grid.setTargetPosition(oldX, oldY);
+                for (GridTile newTile: newTiles) {
+                    rollEnemySpawn(newTile);
+                }
                 player.animateJump(grid.getTile(playerX, playerY));
                 player.setGridPosition(playerX, playerY);
                 camera.setFocusPosition(playerX, playerY);
@@ -101,6 +111,7 @@ public class Game {
         ArrayList<ModelParticles> modelParticlesToRemove = new ArrayList<>();
         for (ModelParticles emitter: modelParticles) {
             if (!emitter.step(delta)) {
+                emitter.dispose();
                 modelParticlesToRemove.add(emitter);
             }
         }

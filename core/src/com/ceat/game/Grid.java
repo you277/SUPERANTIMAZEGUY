@@ -2,8 +2,10 @@ package com.ceat.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.ceat.game.entity.GridEntity;
 import com.ceat.game.entity.GridTile;
 import com.ceat.game.entity.Player;
+import com.ceat.game.entity.enemy.Enemy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,23 +38,42 @@ public class Grid {
         return new Vector3(x*6, (float)Math.sin(lifetime*2 + x + y)*0.7f, y*6);
     }
 
-    public Grid checkTiles(int playerX, int playerY) {
+    private void cullGridEntities(ArrayList<GridEntity> entities, ArrayList<GridTile> tiles) {
+        ArrayList<GridEntity> toAnnihilate = new ArrayList<>();
+        for (GridEntity entity: entities) {
+            for (GridTile tile: tiles) {
+                if (entity.getParentTile() == tile) {
+                    entity.dispose();
+                    toAnnihilate.add(entity);
+                    break;
+                }
+            }
+        }
+        for (GridEntity entity: toAnnihilate) {
+            entities.remove(entity);
+        }
+    }
+
+    public ArrayList<GridTile> checkTiles(int playerX, int playerY, ArrayList<Enemy> enemies) {
         HashMap<String, Integer> wow = new HashMap<>();
         for (int i = 0; i < gridTiles.size(); i++) {
             GridTile tile = gridTiles.get(i);
             wow.put(tile.getX() + "~" + tile.getY(), i);
         }
-        for (int xOffset = -gridDistance; xOffset <= gridDistance; xOffset++) {
-            for (int yOffset = -gridDistance; yOffset <= gridDistance; yOffset++) {
+        ArrayList<GridTile> newTiles = new ArrayList<>();
+        for (int xOffset = -gridDistance + 1; xOffset < gridDistance; xOffset++) {
+            for (int yOffset = -gridDistance + 1; yOffset < gridDistance; yOffset++) {
                 int x = targetX + xOffset;
                 int y = targetY + yOffset;
                 String index = x + "~" + y;
                 if (!wow.containsKey(index)) {
-                    gridTiles.add(new GridTile(x, y, this, (playerX == x && playerY == y) || Math.random() < 0.8) {
+                    GridTile coolnewTile = new GridTile(x, y, this, (playerX == x && playerY == y) || Math.random() < 0.8) {
                         public void onDispose() {
                             removingTiles.remove(this);
                         }
-                    });
+                    };
+                    gridTiles.add(coolnewTile);
+                    newTiles.add(coolnewTile);
                 }
             }
         }
@@ -69,7 +90,26 @@ public class Grid {
             gridTiles.remove(tile);
             removingTiles.add(tile);
         }
-        return this;
+        new Schedule().wait(0.3f).run(new Schedule.Task() {
+            public void run() {
+                ArrayList<GridEntity> everyEntityEver = new ArrayList<>();
+                if (enemies != null) {
+                    for (Enemy enemy : enemies) {
+                        everyEntityEver.add(enemy);
+                    }
+                }
+                cullGridEntities(everyEntityEver, tilesToRemove);
+                for (GridTile tile: tilesToRemove) {
+                    tile.dispose();
+                    removingTiles.remove(tile);
+                }
+            }
+        });
+        return newTiles;
+    }
+
+    public ArrayList<GridTile> checkTiles(int playerX, int playerY) {
+        return checkTiles(playerX, playerY, null);
     }
 
     public GridTile getTile(int x, int y) {
