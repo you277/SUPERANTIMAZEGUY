@@ -7,8 +7,10 @@ import com.ceat.game.Font;
 import com.ceat.game.Master;
 
 public class GameGui {
-    BitmapFont epicFont;
-    float lifetime;
+    public final DistanceLabel distanceLabel = new DistanceLabel();
+    public final TimerLabel timerLabel = new TimerLabel();
+    private BitmapFont epicFont;
+    private float lifetime;
 
     public GameGui() {
         epicFont = Font.create(new Font.ParamSetter() {
@@ -22,6 +24,13 @@ public class GameGui {
         lifetime += Master.getDeltaTime();
     }
     public void draw(SpriteBatch batch) {
+        distanceLabel.draw(batch);
+        timerLabel.draw(batch);
         epicFont.draw(batch, "hello", 0 + Font.getTextWidth(epicFont, "hello"), 0 + Font.getTextHeight(epicFont, "hello") + (float)Math.sin(lifetime)*10);
+    }
+
+    public void dispose() {
+        distanceLabel.dispose();
+        timerLabel.dispose();
     }
 }

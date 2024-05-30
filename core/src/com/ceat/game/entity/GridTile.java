@@ -16,6 +16,7 @@ public class GridTile {
     private boolean active;
     private float lifetime;
     private boolean isExisting;
+    private boolean isOnBoard = true;
     public GridTile(int x, int y, Grid grid, boolean tileExists) {
         this.grid = grid;
         this.x = x;
@@ -71,6 +72,10 @@ public class GridTile {
        }
     }
 
+    public boolean getIsOnBoard() {
+        return isOnBoard;
+    }
+
     public void exit() {
         active = false;
         new Loop(0.3f) {
@@ -78,6 +83,7 @@ public class GridTile {
                 yOffset = Lerp.lerp(0, 20, elapsed/0.3f);
             }
             public void onEnd() {
+                isOnBoard = false;
                 onDispose();
                 dispose();
             }

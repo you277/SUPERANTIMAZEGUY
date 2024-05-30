@@ -38,11 +38,16 @@ public class Grid {
         return new Vector3(x*6, (float)Math.sin(lifetime*2 + x + y)*0.7f, y*6);
     }
 
-    private void cullGridEntities(ArrayList<GridEntity> entities, ArrayList<GridTile> tiles) {
+    private void cullGridEntities(ArrayList<GridEntity> entities, ArrayList<GridTile> tilesBeingAnnihilated) {
+//        System.out.println(tilesBeingAnnihilated);
         ArrayList<GridEntity> toAnnihilate = new ArrayList<>();
         for (GridEntity entity: entities) {
-            for (GridTile tile: tiles) {
+            for (GridTile tile: tilesBeingAnnihilated) {
+                GridTile tile2 = entity.getParentTile();
+                System.out.print(tile);System.out.print(" " + tile.getX() + "," + tile.getY() + " ");
+                System.out.print(tile2);System.out.println(" " + tile2.getX() + "," + tile2.getY());
                 if (entity.getParentTile() == tile) {
+                    System.out.println("scary");
                     entity.dispose();
                     toAnnihilate.add(entity);
                     break;
@@ -92,13 +97,13 @@ public class Grid {
         }
         new Schedule().wait(0.3f).run(new Schedule.Task() {
             public void run() {
-                ArrayList<GridEntity> everyEntityEver = new ArrayList<>();
-                if (enemies != null) {
-                    for (Enemy enemy : enemies) {
-                        everyEntityEver.add(enemy);
-                    }
-                }
-                cullGridEntities(everyEntityEver, tilesToRemove);
+//                ArrayList<GridEntity> everyEntityEver = new ArrayList<>();
+//                if (enemies != null) {
+//                    for (Enemy enemy : enemies) {
+//                        everyEntityEver.add(enemy);
+//                    }
+//                }
+//                cullGridEntities(everyEntityEver, tilesToRemove);
                 for (GridTile tile: tilesToRemove) {
                     tile.dispose();
                     removingTiles.remove(tile);

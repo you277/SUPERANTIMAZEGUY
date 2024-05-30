@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.ceat.game.entity.GridEntity;
 import com.ceat.game.entity.GridTile;
 import com.ceat.game.entity.Player;
+import com.ceat.game.entity.enemy.BulletEnemy;
 import com.ceat.game.entity.enemy.Enemy;
+import com.ceat.game.entity.enemy.RandomEnemy;
 import com.ceat.game.fx.ModelParticles;
 import com.ceat.game.gui.GameGui;
 
@@ -40,10 +42,26 @@ public class Game {
     public void addParticles(ModelParticles modelParticle) {
         modelParticles.add(modelParticle);
     }
+    public ArrayList<Enemy> getEnemies() {
+        return enemies;
+    }
 
     private void rollEnemySpawn(GridTile tile) {
         if (!tile.getIsExistent()) return;
+        float distance = (float)Math.sqrt(Math.pow(playerX, 2) + Math.pow(playerY, 2));
         if (Math.random() < 0.3) {
+            if (distance > 10) {
+                if (Math.random() < 0.3) {
+                    enemies.add(new RandomEnemy(grid, tile.getX(), tile.getY()));
+                    return;
+                }
+                if (distance > 25) {
+                    if (Math.random() < 0.3) {
+                        enemies.add(new BulletEnemy(grid, tile.getX(), tile.getY()));
+                        return;
+                    }
+                }
+            }
             enemies.add(new Enemy(grid, tile.getX(), tile.getY()));
         }
     }
@@ -72,6 +90,9 @@ public class Game {
                 return;
             }
             GridTile tile = grid.getTile(playerX, playerY);
+            for (Enemy enemy: enemies) {
+                enemy.doTurn();
+            }
             if (tile.getIsExistent()) {
                 grid.setTargetPosition(playerX, playerY);
                 ArrayList<GridTile> newTiles = grid.checkTiles(playerX, playerY, enemies);
@@ -79,12 +100,18 @@ public class Game {
                 for (GridTile newTile: newTiles) {
                     rollEnemySpawn(newTile);
                 }
+                gameGui.distanceLabel.setDistance(playerX, playerY);
                 player.animateJump(grid.getTile(playerX, playerY));
                 player.setGridPosition(playerX, playerY);
                 camera.setFocusPosition(playerX, playerY);
                 allowMovementInput = false;
                 new Schedule().wait(GridEntity.jumpDuration).run(new Schedule.Task() {
                     public void run() {
+                        for (Enemy enemy: enemies) {
+                            if (enemy.collidesWithPlayer(player)) {
+                                System.out.println("dead");
+                            }
+                        }
                         allowMovementInput = true;
                     }
                 });
@@ -105,8 +132,16 @@ public class Game {
         camera.render(delta);
         grid.render(batch);
         player.render();
+        ArrayList<Enemy> enemiesToDestroy = new ArrayList<>();
         for (Enemy enemy: enemies) {
-            enemy.render();
+            if (enemy.getParentTile().getIsOnBoard()) {
+                enemy.render();
+            } else {
+                enemiesToDestroy.add(enemy);
+            }
+        }
+        for (Enemy enemy: enemiesToDestroy) {
+            enemies.remove(enemy);
         }
         ArrayList<ModelParticles> modelParticlesToRemove = new ArrayList<>();
         for (ModelParticles emitter: modelParticles) {
