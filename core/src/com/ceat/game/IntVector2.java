@@ -49,4 +49,8 @@ public class IntVector2 {
     public boolean equals(int x, int y) {
         return this.x == x && this.y == y;
     }
+
+    public String toString() {
+        return "(" + x + "," + y + ")";
+    }
 }

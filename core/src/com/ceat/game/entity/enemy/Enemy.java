@@ -11,6 +11,13 @@ import com.ceat.game.fx.ModelParticles;
 import com.ceat.game.fx.SpawnBeam;
 
 public class Enemy extends GridEntity {
+    public static boolean overlapsOtherEnemy(Enemy enemy, int x, int y) {
+        for (Enemy other: Game.current.getEnemies()) {
+            if (other == enemy) continue;
+            if (other.getGridPosition().equals(x, y)) return true;
+        }
+        return false;
+    }
     public Enemy(Grid grid, int initX, int initY) {
         super(grid);
         getModel().setColor(getColor());
@@ -37,7 +44,7 @@ public class Enemy extends GridEntity {
         new SpawnBeam(getColor(), initX*6, initY*6);
     }
 
-    public void doTurn() {
+    public void doTurn(Player player) {
 
     }
 

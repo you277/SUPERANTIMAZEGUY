@@ -3,12 +3,14 @@ package com.ceat.game;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.ceat.game.entity.Bullet;
 import com.ceat.game.entity.GridEntity;
 import com.ceat.game.entity.GridTile;
 import com.ceat.game.entity.Player;
 import com.ceat.game.entity.enemy.BulletEnemy;
 import com.ceat.game.entity.enemy.Enemy;
-import com.ceat.game.entity.enemy.RandomEnemy;
+import com.ceat.game.entity.enemy.IdkEnemy;
+import com.ceat.game.entity.enemy.MoveEnemy;
 import com.ceat.game.fx.ModelParticles;
 import com.ceat.game.gui.GameGui;
 
@@ -27,6 +29,7 @@ public class Game {
 
     // effect stuff;
     private ArrayList<ModelParticles> modelParticles = new ArrayList<>();
+    private ArrayList<Bullet> bullets = new ArrayList<>();
 
     public Game() {
         grid = new Grid();
@@ -42,6 +45,9 @@ public class Game {
     public void addParticles(ModelParticles modelParticle) {
         modelParticles.add(modelParticle);
     }
+    public void addBullet(Bullet bullet) {
+        bullets.add(bullet);
+    }
     public ArrayList<Enemy> getEnemies() {
         return enemies;
     }
@@ -50,15 +56,25 @@ public class Game {
         if (!tile.getIsExistent()) return;
         float distance = (float)Math.sqrt(Math.pow(playerX, 2) + Math.pow(playerY, 2));
         if (Math.random() < 0.3) {
+            enemies.add(new BulletEnemy(grid, tile.getX(), tile.getY()));
+            return;
+        }
+        if (Math.random() < 0.3) {
             if (distance > 10) {
                 if (Math.random() < 0.3) {
-                    enemies.add(new RandomEnemy(grid, tile.getX(), tile.getY()));
+                    enemies.add(new MoveEnemy(grid, tile.getX(), tile.getY()));
                     return;
                 }
                 if (distance > 25) {
                     if (Math.random() < 0.3) {
-                        enemies.add(new BulletEnemy(grid, tile.getX(), tile.getY()));
+                        enemies.add(new IdkEnemy(grid, tile.getX(), tile.getY()));
                         return;
+                    }
+                    if (distance > 40) {
+                        if (Math.random() < 0.3) {
+                            enemies.add(new BulletEnemy(grid, tile.getX(), tile.getY()));
+                            return;
+                        }
                     }
                 }
             }
@@ -91,7 +107,7 @@ public class Game {
             }
             GridTile tile = grid.getTile(playerX, playerY);
             for (Enemy enemy: enemies) {
-                enemy.doTurn();
+                enemy.doTurn(player);
             }
             if (tile.getIsExistent()) {
                 grid.setTargetPosition(playerX, playerY);
@@ -150,12 +166,24 @@ public class Game {
                 modelParticlesToRemove.add(emitter);
             }
         }
+        ArrayList<Bullet> bulletsToErase = new ArrayList<>();
+        for (Bullet bullet: bullets) {
+            if (!bullet.step(delta)) {
+                bulletsToErase.add(bullet);
+            }
+        }
+        for (Bullet bullet: bulletsToErase) {
+            bullets.remove(bullet);
+        }
         for (ModelParticles emitter: modelParticlesToRemove) {
             modelParticles.remove(emitter);
         }
         player.draw(batch);
         for (ModelParticles emitter: modelParticles) {
             emitter.draw(batch);
+        }
+        for (Bullet bullet: bullets) {
+            bullet.draw(batch);
         }
         for (Enemy enemy: enemies) {
             enemy.draw(batch);

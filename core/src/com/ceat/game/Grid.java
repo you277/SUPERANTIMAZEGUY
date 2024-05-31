@@ -35,7 +35,7 @@ public class Grid {
     }
 
     public Vector3 imagineTilePosition(int x, int y) {
-        return new Vector3(x*6, (float)Math.sin(lifetime*2 + x + y)*0.7f, y*6);
+        return new Vector3(x*6, (float)Math.sin(lifetime*2 + x + y)*0.7f + (float)Math.sin(lifetime/3)*5, y*6);
     }
 
     private void cullGridEntities(ArrayList<GridEntity> entities, ArrayList<GridTile> tilesBeingAnnihilated) {
