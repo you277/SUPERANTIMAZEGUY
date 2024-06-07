@@ -8,7 +8,7 @@ import com.ceat.game.SimpleModelInstance;
 import com.ceat.game.entity.GridEntity;
 import com.ceat.game.entity.Player;
 import com.ceat.game.fx.ModelParticles;
-import com.ceat.game.fx.SpawnBeam;
+import com.ceat.game.fx.SkyBeam;
 
 public class Enemy extends GridEntity {
     public static boolean overlapsOtherEnemy(Enemy enemy, int x, int y) {
@@ -41,7 +41,7 @@ public class Enemy extends GridEntity {
                 .setSpeed(20, 30)
                 .emit(5)
         );
-        new SpawnBeam(getColor(), initX*6, initY*6);
+        new SkyBeam(getColor(), initX*6, initY*6);
     }
 
     public void doTurn(Player player) {

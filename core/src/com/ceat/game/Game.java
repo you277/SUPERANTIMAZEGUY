@@ -1,8 +1,10 @@
 package com.ceat.game;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.math.Vector3;
 import com.ceat.game.entity.Bullet;
 import com.ceat.game.entity.GridEntity;
 import com.ceat.game.entity.GridTile;
@@ -12,6 +14,7 @@ import com.ceat.game.entity.enemy.Enemy;
 import com.ceat.game.entity.enemy.IdkEnemy;
 import com.ceat.game.entity.enemy.MoveEnemy;
 import com.ceat.game.fx.ModelParticles;
+import com.ceat.game.fx.SkyBeam;
 import com.ceat.game.gui.GameGui;
 
 import java.util.ArrayList;
@@ -52,13 +55,18 @@ public class Game {
         return enemies;
     }
 
+    public Enemy getEnemyFromPosition(int x, int y) {
+        for (Enemy enemy: enemies) {
+            if (enemy.getGridPosition().equals(x, y)) {
+                return enemy;
+            }
+        }
+        return null;
+    }
+
     private void rollEnemySpawn(GridTile tile) {
         if (!tile.getIsExistent()) return;
         float distance = (float)Math.sqrt(Math.pow(playerX, 2) + Math.pow(playerY, 2));
-        if (Math.random() < 0.3) {
-            enemies.add(new BulletEnemy(grid, tile.getX(), tile.getY()));
-            return;
-        }
         if (Math.random() < 0.3) {
             if (distance > 10) {
                 if (Math.random() < 0.3) {
@@ -82,6 +90,55 @@ public class Game {
         }
     }
 
+    private GridTile getRandomTileInDist(int dist, int recurDepth) {
+        if (recurDepth > 10) return null;
+        int x = playerX - dist/2 + (int)(Math.random()*dist + 0.5);
+        int y = playerY - dist/2 + (int)(Math.random()*dist + 0.5);
+        GridTile tile = grid.getTile(x, y);
+        if (tile == null || !tile.getIsExistent()) return getRandomTileInDist(dist, recurDepth + 1);
+        return tile;
+    }
+
+    private GridTile getRandomTileInDist(int dist) {
+        return getRandomTileInDist(dist, 0);
+    }
+
+    private void attack1() {
+        ArrayList<ModelParticles> particles = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            GridTile tile = getRandomTileInDist(3);
+            if (tile == null) continue;
+            Enemy enemyHit = getEnemyFromPosition(tile.getX(), tile.getY());
+            new SkyBeam(new Color(1, 1, 1, 1), tile.getX()*6, tile.getY()*6);
+            if (enemyHit != null) {
+                enemyHit.dispose();
+                enemies.remove(enemyHit);
+                ModelParticles particlesWow = new ModelParticles(SimpleModelInstance.sphereModel)
+                        .setColor(new Color(1, 1, 1, 1))
+                        .setScale(3, 0)
+                        .setDirection(new Vector3(0, 1, 0))
+                        .setSpread((float)Math.random()*3.14f/3, (float)Math.random()*3.14f/3)
+                        .setEnabled(true)
+                        .setLifetime(0.5f, 1f)
+                        .setRate(3)
+                        .setOrigin(tile.getAbsolutePosition())
+                        .setSpeed(30, 50)
+                        .emit(5);
+                addParticles(particlesWow);
+                particles.add(particlesWow);
+            }
+        }
+        if (!particles.isEmpty()) {
+            new Schedule().wait(0.6f).run(new Schedule.Task() {
+                public void run() {
+                    for (ModelParticles particle5000: particles) {
+                        particle5000.setEnabled(false);
+                    }
+                }
+            });
+        }
+    }
+
     public void keydown(int keycode) {
         int oldX = playerX;
         int oldY = playerY;
@@ -98,6 +155,8 @@ public class Game {
             case Input.Keys.D:
                 playerX++;
                 break;
+            case Input.Keys.NUM_1:
+                attack1();
         }
         if (oldX != playerX || oldY != playerY) {
             if (!allowMovementInput) {

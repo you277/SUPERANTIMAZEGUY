@@ -8,7 +8,7 @@ import com.ceat.game.SimpleModelInstance;
 
 
 
-public class SpawnBeam extends  Effect {
+public class SkyBeam extends  Effect {
     private SimpleModelInstance model;
     private float rotation;
 
@@ -16,7 +16,7 @@ public class SpawnBeam extends  Effect {
         return EffectType.MODEL;
     }
 
-    public SpawnBeam(Color color, float x, float y) {
+    public SkyBeam(Color color, float x, float y) {
         model = new SimpleModelInstance(SimpleModelInstance.cubeModel)
                 .setColor(color)
                 .setPosition(x, 0, y)

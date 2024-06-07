@@ -22,9 +22,8 @@ public class BulletEnemy extends Enemy {
             double thisRotation = rotation + Math.PI*0.5*i;
             double xDir = Math.cos(thisRotation);
             double yDir = Math.sin(thisRotation);
-            System.out.print(getGridPosition());System.out.println(getAbsolutePosition());
 
-            Game.current.addBullet(new Bullet(getAbsolutePosition(), new Vector3((float)xDir, 0, (float)yDir), 9f));
+            Game.current.addBullet(new Bullet(getParentTile().getAbsolutePosition(), new Vector3((float)xDir, 0, (float)yDir), 9f));
         }
     }
 }

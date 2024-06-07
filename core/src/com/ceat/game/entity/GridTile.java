@@ -66,7 +66,7 @@ public class GridTile {
 
     public void render(float lifetime, ModelBatch batch) {
         this.lifetime = lifetime;
-       if (model != null) {
+        if (model != null) {
            model.setPosition(getAbsolutePosition());
            model.render(batch);
        }
