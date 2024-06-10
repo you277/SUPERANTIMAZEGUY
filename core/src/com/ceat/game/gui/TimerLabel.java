@@ -11,6 +11,7 @@ public class TimerLabel {
     private BitmapFont font;
     private float yOffset;
     private float lifetime;
+    private boolean enabled = true;
     public TimerLabel() {
         font = Font.create(new Font.ParamSetter() {
             public void run (FreeTypeFontGenerator.FreeTypeFontParameter params) {
@@ -18,9 +19,14 @@ public class TimerLabel {
             }
         });
     }
+    public void setTimerEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public void draw(SpriteBatch batch) {
-        lifetime += Master.getDeltaTime();
+        if (enabled) {
+            lifetime += Master.getDeltaTime();
+        }
         float seconds = (float)Math.floor((lifetime%60)*1000)/1000; // with millis
         int minutes = (int)lifetime/60;
         font.draw(batch, (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds), 10, Gdx.graphics.getHeight()*0.75f);

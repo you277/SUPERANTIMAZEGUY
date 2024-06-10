@@ -44,6 +44,10 @@ public class Enemy extends GridEntity {
         new SkyBeam(getColor(), initX*6, initY*6);
     }
 
+    public String getName() {
+        return "RED ENEMY";
+    }
+
     public void doTurn(Player player) {
 
     }

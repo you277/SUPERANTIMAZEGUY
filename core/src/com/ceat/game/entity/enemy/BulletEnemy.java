@@ -16,6 +16,10 @@ public class BulletEnemy extends Enemy {
         return new Color(0, 1, 0, 1);
     }
 
+    public String getName() {
+        return "GREEN ENEMY";
+    }
+
     public void doTurn(Player player) {
         double rotation = Math.random()*Math.PI*2;
         for (int i = 0; i < 4; i++) {

@@ -9,6 +9,7 @@ import com.ceat.game.Master;
 public class GameGui {
     public final DistanceLabel distanceLabel = new DistanceLabel();
     public final TimerLabel timerLabel = new TimerLabel();
+    public final DeathLabel deathLabel = new DeathLabel();
     private BitmapFont epicFont;
     private float lifetime;
 
@@ -26,11 +27,13 @@ public class GameGui {
     public void draw(SpriteBatch batch) {
         distanceLabel.draw(batch);
         timerLabel.draw(batch);
+        deathLabel.draw(batch);
         epicFont.draw(batch, "hello", 0 + Font.getTextWidth(epicFont, "hello"), 0 + Font.getTextHeight(epicFont, "hello") + (float)Math.sin(lifetime)*10);
     }
 
     public void dispose() {
         distanceLabel.dispose();
         timerLabel.dispose();
+        deathLabel.dispose();
     }
 }

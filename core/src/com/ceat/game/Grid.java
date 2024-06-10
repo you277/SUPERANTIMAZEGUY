@@ -95,8 +95,9 @@ public class Grid {
             gridTiles.remove(tile);
             removingTiles.add(tile);
         }
-        new Schedule().wait(0.3f).run(new Schedule.Task() {
-            public void run() {
+        if (!tilesToRemove.isEmpty()) {
+            new Schedule().wait(0.3f).run(new Schedule.Task() {
+                public void run() {
 //                ArrayList<GridEntity> everyEntityEver = new ArrayList<>();
 //                if (enemies != null) {
 //                    for (Enemy enemy : enemies) {
@@ -104,12 +105,13 @@ public class Grid {
 //                    }
 //                }
 //                cullGridEntities(everyEntityEver, tilesToRemove);
-                for (GridTile tile: tilesToRemove) {
-                    tile.dispose();
-                    removingTiles.remove(tile);
+                    for (GridTile tile: tilesToRemove) {
+                        tile.dispose();
+                        removingTiles.remove(tile);
+                    }
                 }
-            }
-        });
+            });
+        }
         return newTiles;
     }
 
@@ -138,6 +140,15 @@ public class Grid {
         }
         for (GridTile tile: gridTiles) {
             tile.render(lifetime, batch);
+        }
+    }
+
+    public void dispose() {
+        for (GridTile tile: removingTiles) {
+            tile.dispose();
+        }
+        for (GridTile tile: gridTiles) {
+            tile.dispose();
         }
     }
 }

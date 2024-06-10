@@ -19,6 +19,10 @@ public class IdkEnemy extends Enemy {
     private boolean forward = true;
     private int moveStage;
 
+    public String getName() {
+        return "MAGENTA ENEMY";
+    }
+
     public void doTurn(Player player) {
         int[] moveDir = movements[moveStage];
         IntVector2 pos = getGridPosition();

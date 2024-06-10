@@ -15,6 +15,10 @@ public class Bullet {
         model = new SimpleModelInstance(SimpleModelInstance.sphereModel).setColor(1, 1, 1).setScale(0.75f);
     }
 
+    public Vector3 getPosition() {
+        return position;
+    }
+
     public boolean step(float delta) {
         lifetime += delta;
         if (lifetime > 3) {

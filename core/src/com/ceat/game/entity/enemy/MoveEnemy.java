@@ -15,6 +15,10 @@ public class MoveEnemy extends Enemy {
         return new Color(0, 0, 1, 1);
     }
 
+    public String getName() {
+        return "BLUE ENEMY";
+    }
+
     public GridTile randomMove() {
         int[] offset = {0, 0};
         int rand = (int)(Math.random()*4);

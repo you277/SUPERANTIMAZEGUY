@@ -6,12 +6,17 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.ceat.game.Lerp;
+import com.ceat.game.Master;
 import com.ceat.game.SimpleModelInstance;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
 
 public class ModelParticles {
+    public enum TimeScale {
+        SYNCED,
+        ABSOLUTE
+    }
     private static class Particle {
         private final float speed;
         private final float rotSpeed;
@@ -71,6 +76,7 @@ public class ModelParticles {
         }
     }
     private boolean enabled = true;
+    private TimeScale timeScale;
     private float spreadX;
     private float spreadY;
     private float minSpeed;
@@ -88,9 +94,15 @@ public class ModelParticles {
     private ArrayList<Particle> particles = new ArrayList<>();
     private final Model baseModel;
 
-    public ModelParticles(Model model) {
+    public ModelParticles(Model model, TimeScale timeScale) {
+        this.timeScale =  timeScale;
         baseModel = model;
     }
+    public ModelParticles(Model model) {
+        timeScale = TimeScale.SYNCED;
+        baseModel = model;
+    }
+
     public ModelParticles setEnabled(boolean enabled) {
         this.enabled = enabled;
         return this;
@@ -177,7 +189,8 @@ public class ModelParticles {
 
     private float lastEmitTime;
     private float existenceTime;
-    public boolean step(float delta) {
+    public boolean step() {
+        float delta = timeScale == TimeScale.SYNCED ? Master.getDeltaTime() : Master.getRawDeltaTime();
         float now = existenceTime + delta;
         existenceTime = now;
         int emitAmt = (int)((now - lastEmitTime)/rate);
@@ -197,7 +210,7 @@ public class ModelParticles {
             particle.dispose();
             particles.remove(particle);
         }
-        return particles.size() > 0;
+        return !particles.isEmpty();
     }
 
     public void draw(ModelBatch batch) {

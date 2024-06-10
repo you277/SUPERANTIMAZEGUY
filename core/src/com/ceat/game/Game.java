@@ -14,6 +14,7 @@ import com.ceat.game.entity.enemy.Enemy;
 import com.ceat.game.entity.enemy.IdkEnemy;
 import com.ceat.game.entity.enemy.MoveEnemy;
 import com.ceat.game.fx.ModelParticles;
+import com.ceat.game.fx.PlayerDeath;
 import com.ceat.game.fx.SkyBeam;
 import com.ceat.game.gui.GameGui;
 
@@ -21,18 +22,19 @@ import java.util.ArrayList;
 
 public class Game {
     public static Game current;
-    private Grid grid;
+    private boolean active = true;
+    private final Grid grid;
     private final Player player;
     private final CoolCamera camera;
-    private GameGui gameGui;
+    private final GameGui gameGui;
     private int playerX;
     private int playerY;
-    private ArrayList<Enemy> enemies = new ArrayList<>();
+    private final ArrayList<Enemy> enemies = new ArrayList<>();
     private boolean allowMovementInput = true;
 
     // effect stuff;
-    private ArrayList<ModelParticles> modelParticles = new ArrayList<>();
-    private ArrayList<Bullet> bullets = new ArrayList<>();
+    private final ArrayList<ModelParticles> modelParticles = new ArrayList<>();
+    private final ArrayList<Bullet> bullets = new ArrayList<>();
 
     public Game() {
         grid = new Grid();
@@ -113,6 +115,7 @@ public class Game {
             if (enemyHit != null) {
                 enemyHit.dispose();
                 enemies.remove(enemyHit);
+                camera.shake(5, 0.3f);
                 ModelParticles particlesWow = new ModelParticles(SimpleModelInstance.sphereModel)
                         .setColor(new Color(1, 1, 1, 1))
                         .setScale(3, 0)
@@ -156,6 +159,7 @@ public class Game {
                 playerX++;
                 break;
             case Input.Keys.NUM_1:
+                if (!active) return;
                 attack1();
         }
         if (oldX != playerX || oldY != playerY) {
@@ -180,11 +184,16 @@ public class Game {
                 player.setGridPosition(playerX, playerY);
                 camera.setFocusPosition(playerX, playerY);
                 allowMovementInput = false;
+
                 new Schedule().wait(GridEntity.jumpDuration).run(new Schedule.Task() {
                     public void run() {
                         for (Enemy enemy: enemies) {
                             if (enemy.collidesWithPlayer(player)) {
-                                System.out.println("dead");
+                                gameGui.timerLabel.setTimerEnabled(false);
+                                active = false;
+                                gameGui.deathLabel.enable(enemy.getName());
+                                deathSequence();
+                                return;
                             }
                         }
                         allowMovementInput = true;
@@ -197,9 +206,39 @@ public class Game {
             }
         }
     }
+    public void deathSequence() {
+        player.setVisible(false);
+        new PlayerDeath(player.getParentTile().getAbsolutePosition());
+        camera.shake(15, 1f);
+        new Loop(2, Loop.LoopType.ABSOLUTE) {
+            public void run(float delta, float elapsed) {
+                Master.setGameSpeed(1 - elapsed/2);
+            }
+            public void onEnd() {
+                Master.setGameSpeed(0);
+            }
+        };
+        new Loop(3, Loop.LoopType.ABSOLUTE) {
+            public void onEnd() {
+                restart();
+            }
+        };
+    }
 
     public CoolCamera getCamera() {
         return camera;
+    }
+
+    public boolean getIsDeadByBullet() {
+        Vector3 playerPos = player.getParentTile().getAbsolutePosition();
+        for (Bullet bullet: bullets) {
+            Vector3 bulletPos = bullet.getPosition();
+            double magnitude = Math.sqrt(Math.pow(bulletPos.x - playerPos.x, 2) + Math.pow(bulletPos.y - playerPos.y, 2) + Math.pow(bulletPos.z - playerPos.z, 2));
+            if (magnitude < 1.5) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void renderModels(ModelBatch batch) {
@@ -220,10 +259,16 @@ public class Game {
         }
         ArrayList<ModelParticles> modelParticlesToRemove = new ArrayList<>();
         for (ModelParticles emitter: modelParticles) {
-            if (!emitter.step(delta)) {
+            if (!emitter.step()) {
                 emitter.dispose();
                 modelParticlesToRemove.add(emitter);
             }
+        }
+        if (active && getIsDeadByBullet()) {
+            allowMovementInput = false;
+            active = false;
+            gameGui.deathLabel.enable("GREEN ENEMY BULLET");
+            deathSequence();
         }
         ArrayList<Bullet> bulletsToErase = new ArrayList<>();
         for (Bullet bullet: bullets) {
@@ -253,8 +298,28 @@ public class Game {
         gameGui.draw(batch);
     }
 
+    // to be overriden by master
+    public void restart() {
+
+    }
+
+
     public void rotateCamera(float xRot, float yRot) {
         camera.rotateHorizontal(xRot);
         camera.rotateVertical(yRot);
+    }
+
+    public void dispose() {
+        player.dispose();
+        for (Enemy enemy: enemies) {
+            enemy.dispose();
+        }
+        for (ModelParticles particles: modelParticles) {
+            particles.dispose();
+        }
+        for (Bullet bullet: bullets) {
+            bullet.dispose();
+        }
+        gameGui.dispose();
     }
 }

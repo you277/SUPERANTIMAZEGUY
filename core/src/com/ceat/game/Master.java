@@ -15,14 +15,33 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 	private static float elapsed;
 	private static float gameSpeed = 1;
 	private Game game;
+	private boolean started;
+	private TexSprite epicStartScreen;
 	
 	@Override
 	public void create() {
 		Gdx.input.setInputProcessor(this);
 		batch = new SpriteBatch();
 		modelBatch = new ModelBatch();
-		game = new Game();
+		epicStartScreen = new TexSprite("img/OPWTH.png");
+	}
+	
+	public void init() {
+		started = true;
+		epicStartScreen.dispose();
+		epicStartScreen = null;
 		Font.createGenerator();
+		newGame();
+	}
+
+	public void newGame() {
+		game = new Game() {
+			public void restart() {
+				game.dispose();
+				setGameSpeed(1);
+				newGame();
+			}
+		};
 	}
 
 	public static float getRawDeltaTime() {
@@ -31,6 +50,12 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 
 	public static float getDeltaTime() {
 		return getRawDeltaTime()*gameSpeed;
+	}
+	public static void setGameSpeed(float speed) {
+		gameSpeed = speed;
+	}
+	public static float getGameSpeed() {
+		return gameSpeed;
 	}
 	float horizontalRot;
 	float verticalRot;
@@ -44,7 +69,14 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public void render() {
+		if (!started) {
+			batch.begin();
+			epicStartScreen.draw(batch);
+			batch.end();
+			return;
+		}
 		float delta = getDeltaTime();
+		float rawDelta = getRawDeltaTime();
 		elapsed += delta;
 
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -68,8 +100,8 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 			verticalRot = Math.min(verticalRot + delta*180, 80);
 		}
 
-		Schedule.runTasks(delta);
-		Loop.runLoops(delta);
+		Schedule.runTasks(rawDelta);
+		Loop.runLoops(delta, rawDelta);
 
 		modelBatch.begin(game.getCamera().getCamera());
 		game.renderModels(modelBatch);
@@ -83,6 +115,10 @@ public class Master extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
+		if (!started) {
+			init();
+			return false;
+		}
 		game.keydown(keycode);
 		return false;
 	}

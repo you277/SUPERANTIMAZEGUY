@@ -14,6 +14,7 @@ public class GridEntity extends Entity {
     private int gridY;
     private GridTile parentTile;
     private boolean isAnimating;
+    private boolean isVisible = true;
     public GridEntity(Grid grid) {
         super();
         this.grid = grid;
@@ -54,6 +55,10 @@ public class GridEntity extends Entity {
         };
     }
 
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
+
     public void render() {
         if (!isAnimating && parentTile != null) {
             Vector3 p = parentTile.getAbsolutePosition();
@@ -61,6 +66,7 @@ public class GridEntity extends Entity {
         }
     }
     public void draw(ModelBatch batch) {
+        if (!isVisible) return;
         getModel().render(batch);
     }
 
